@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+    id 'maven'
+    id 'maven-publish'
+}
+
+group 'com.robolancers.lib'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+wrapper {
+    gradleVersion = '4.9'
+}
