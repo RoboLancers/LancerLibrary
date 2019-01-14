@@ -27,7 +27,7 @@ public class LancerSparkMax extends CANSparkMax implements FalconMotor<NativeUni
 
     @Override
     public double getPercentOutput() {
-        return getAppliedOutput();
+        return getAppliedOutput() / getBusVoltage();
     }
 
     @Override
@@ -54,6 +54,6 @@ public class LancerSparkMax extends CANSparkMax implements FalconMotor<NativeUni
 
     @Override
     public void setVelocityAndArbitraryFeedForward(@NotNull Velocity<NativeUnit> velocity, double arbitraryFeedForward) {
-        canpidController.setReference(velocity.getValue(), ControlType.kVelocity, 0, arbitraryFeedForward);
+        canpidController.setReference(velocity.getValue(), ControlType.kVelocity, 0, arbitraryFeedForward * getBusVoltage());
     }
 }
