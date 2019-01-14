@@ -4,25 +4,30 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
+import org.ghrobotics.lib.mathematics.units.SIUnit;
 import org.ghrobotics.lib.mathematics.units.derivedunits.Velocity;
 import org.ghrobotics.lib.mathematics.units.derivedunits.VelocityKt;
 import org.ghrobotics.lib.mathematics.units.derivedunits.Volt;
 import org.ghrobotics.lib.mathematics.units.derivedunits.VoltKt;
-import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnitKt;
+import org.ghrobotics.lib.mathematics.units.nativeunits.*;
 import org.ghrobotics.lib.wrappers.FalconMotor;
 import org.jetbrains.annotations.NotNull;
-import org.ghrobotics.lib.mathematics.units.nativeunits.NativeUnit;
 
 @SuppressWarnings("unused")
-public class LancerSparkMax extends CANSparkMax implements FalconMotor<NativeUnit> {
+public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements FalconMotor<T> {
     private CANPIDController canpidController;
     private CANEncoder canEncoder;
 
-    public LancerSparkMax(int deviceID, MotorType type) {
+    //Native unit model should have gear ratio as sensorUnitPerRevolution and Length as wheel radius
+    private NativeUnitModel<T> nativeUnitModel;
+
+    public LancerSparkMax(int deviceID, MotorType type, NativeUnitModel<T> nativeUnitModel) {
         super(deviceID, type);
 
         canpidController = new CANPIDController(this);
         canEncoder = new CANEncoder(this);
+
+        this.nativeUnitModel = nativeUnitModel;
     }
 
     @Override
@@ -37,23 +42,34 @@ public class LancerSparkMax extends CANSparkMax implements FalconMotor<NativeUni
 
     @NotNull
     @Override
-    public Velocity<NativeUnit> getVelocity() {
-        return VelocityKt.getVelocity(NativeUnitKt.getSTU(canEncoder.getVelocity()));
-    }
-
-    @NotNull
-    @Override
     public Volt getVoltageOutput() {
         return VoltKt.getVolt(getAppliedOutput());
     }
 
+    @NotNull
     @Override
-    public void setVelocity(@NotNull Velocity<NativeUnit> velocity) {
-        canpidController.setReference(velocity.getValue(), ControlType.kVelocity);
+    public Velocity<T> getVelocity() {
+        return NativeUnitVelocityKt.toModel(
+                VelocityKt.getVelocity(NativeUnitKt.getSTU(canEncoder.getVelocity() / 60)),
+                nativeUnitModel
+        );
     }
 
     @Override
-    public void setVelocityAndArbitraryFeedForward(@NotNull Velocity<NativeUnit> velocity, double arbitraryFeedForward) {
-        canpidController.setReference(velocity.getValue(), ControlType.kVelocity, 0, arbitraryFeedForward * getBusVoltage());
+    public void setVelocity(@NotNull Velocity<T> velocity) {
+        canpidController.setReference(
+                NativeUnitVelocityKt.fromModel(velocity, nativeUnitModel).getValue() * 60,
+                ControlType.kVelocity
+        );
+    }
+
+    @Override
+    public void setVelocityAndArbitraryFeedForward(@NotNull Velocity<T> velocity, double arbitraryFeedForward) {
+        canpidController.setReference(
+                NativeUnitVelocityKt.fromModel(velocity, nativeUnitModel).getValue() * 60,
+                ControlType.kVelocity,
+                0,
+                arbitraryFeedForward * getBusVoltage()
+        );
     }
 }
