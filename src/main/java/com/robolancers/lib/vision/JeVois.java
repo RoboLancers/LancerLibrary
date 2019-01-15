@@ -115,7 +115,6 @@ public class JeVois {
         //Start listening for packets
         packetListenerThread.setDaemon(true);
         packetListenerThread.start();
-
     }
 
     public void start(){
@@ -239,6 +238,8 @@ public class JeVois {
         String packet;
 
         prevPacketRxTime = packetRxTime;
+
+        sendCmd("target");
         packet = blockAndGetPacket(2.0);
 
         if(packet != null){
@@ -393,7 +394,6 @@ public class JeVois {
                         retval = -1;
                         break;
                     }
-
                 } else {
                     sleep(10);
                 }
