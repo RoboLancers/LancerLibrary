@@ -27,7 +27,7 @@ public class JeVois {
     private boolean broadcastUSBCam = false;
 
     // When not streaming, use this mapping
-    private static final int NO_STREAM_MAPPING = 0;
+    private static final int NO_STREAM_MAPPING = 1;
 
     // When streaming, use this set of configuration
     private static final int STREAM_WIDTH_PX = 320;
