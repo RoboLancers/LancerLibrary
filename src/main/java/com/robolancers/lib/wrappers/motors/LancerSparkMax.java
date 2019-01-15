@@ -30,6 +30,14 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
         this.nativeUnitModel = nativeUnitModel;
     }
 
+    public CANPIDController getCanpidController(){
+        return canpidController;
+    }
+
+    public CANEncoder getCanEncoder(){
+        return canEncoder;
+    }
+
     @Override
     public double getPercentOutput() {
         return getAppliedOutput() / getBusVoltage();
