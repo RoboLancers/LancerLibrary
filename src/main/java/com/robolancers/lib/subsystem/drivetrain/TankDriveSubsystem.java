@@ -131,10 +131,10 @@ public abstract class TankDriveSubsystem extends Subsystem implements Differenti
     }
 
     public TrajectoryTrackerCommand followTrajectory(TimedTrajectory<Pose2dWithCurvature> trajectory){
-        return new TrajectoryTrackerCommand(this, this, () -> trajectory);
+        return followTrajectory(trajectory, false);
     }
 
-    public TrajectoryTrackerCommand followTrajectory(TimedTrajectory<Pose2dWithCurvature> trajectory, boolean mirrored){
-        return new TrajectoryTrackerCommand(this, this, () -> mirrored ? TimedTrajectoryKt.mirror(trajectory) : trajectory);
+    public TrajectoryTrackerCommand followTrajectory(TimedTrajectory<Pose2dWithCurvature> trajectory, boolean reset){
+        return new TrajectoryTrackerCommand(this, this, () -> trajectory, reset);
     }
 }
