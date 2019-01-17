@@ -35,7 +35,7 @@ public class JeVois {
     private static final int STREAM_RATE_FPS = 30;
 
     // Serial port used for getting target data from JeVois
-    private SerialPort visionPort = null;
+    private SerialPort visionPort;
 
     // USBCam and server used for broadcasting a webstream of what is seen
     private UsbCamera visionCam;
@@ -62,13 +62,11 @@ public class JeVois {
     private double jeVoisFramerateFPS;
     private double packetRxRatePPS;
 
-    private static JeVois instance;
-
     /**
      * Constructor (simple). Opens a USB serial port to the JeVois camera, sends a few test commands checking for error,
      * then fires up the user's program and begins listening for target info packets in the background
      */
-    private JeVois() {
+    public JeVois() {
         this(false); //Default - stream disabled, just run serial.
     }
 
@@ -77,7 +75,7 @@ public class JeVois {
      * then fires up the user's program and begins listening for target info packets in the background.
      * Pass TRUE to additionaly enable a USB camera stream of what the vision camera is seeing.
      */
-    private JeVois(boolean useUSBStream) {
+    public JeVois(boolean useUSBStream) {
         int retry_counter = 0;
 
         //Retry strategy to get this serial port open.
@@ -109,14 +107,14 @@ public class JeVois {
             return;
         }
 
-        //Ensure the JeVois is starting with the stream off.
-        stopDataOnlyStream();
+        // Ensure the JeVois is starting with the stream off.
+        // stopDataOnlyStream();
 
         setCameraStreamActive(useUSBStream);
         start();
 
         //Start listening for packets
-        packetListenerThread.setDaemon(true);
+        // packetListenerThread.setDaemon(true);
         packetListenerThread.start();
     }
 
@@ -288,6 +286,7 @@ public class JeVois {
     private void stopDataOnlyStream(){
         //Send serial commands to stop the streaming of target info
         sendCmdAndCheck("streamoff");
+        visionPort.reset();
         dataStreamRunning = false;
     }
 
@@ -329,8 +328,13 @@ public class JeVois {
      * @return number of bytes written
      */
     private int sendCmd(String cmd){
-        int bytes = visionPort.writeString(cmd + "\n");
-        System.out.println("wrote " +  bytes + "/" + (cmd.length()+1) + " bytes, cmd: " + cmd);
+        int bytes = 0;
+
+        if(visionPort != null) {
+            bytes = visionPort.writeString(cmd + "\n");
+            System.out.println("wrote " + bytes + "/" + (cmd.length() + 1) + " bytes, cmd: " + cmd);
+        }
+
         return bytes;
     }
 
@@ -566,12 +570,4 @@ public class JeVois {
             backgroundUpdate();
         }
     });
-
-    public synchronized static JeVois getInstance() {
-        if (instance == null) {
-            instance = new JeVois(true);
-        }
-
-        return instance;
-    }
 }
