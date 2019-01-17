@@ -21,12 +21,6 @@ public abstract class TankDriveSubsystem extends Subsystem implements Differenti
 
     public abstract Localization getLocalization();
 
-    protected TankDriveSubsystem(){
-        getLocalization().reset(new Pose2d());
-
-        new Notifier(() -> getLocalization().update()).startPeriodic(0.01);
-    }
-
     @NotNull
     @Override
     public Pose2d getRobotPosition(){
