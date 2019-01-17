@@ -569,7 +569,7 @@ public class JeVois {
 
     public synchronized static JeVois getInstance() {
         if (instance == null) {
-            instance = new JeVois();
+            instance = new JeVois(true);
         }
 
         return instance;
