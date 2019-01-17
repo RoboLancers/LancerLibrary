@@ -62,11 +62,13 @@ public class JeVois {
     private double jeVoisFramerateFPS;
     private double packetRxRatePPS;
 
+    private static JeVois instance;
+
     /**
      * Constructor (simple). Opens a USB serial port to the JeVois camera, sends a few test commands checking for error,
      * then fires up the user's program and begins listening for target info packets in the background
      */
-    public JeVois() {
+    private JeVois() {
         this(false); //Default - stream disabled, just run serial.
     }
 
@@ -75,7 +77,7 @@ public class JeVois {
      * then fires up the user's program and begins listening for target info packets in the background.
      * Pass TRUE to additionaly enable a USB camera stream of what the vision camera is seeing.
      */
-    public JeVois(boolean useUSBStream) {
+    private JeVois(boolean useUSBStream) {
         int retry_counter = 0;
 
         //Retry strategy to get this serial port open.
@@ -564,4 +566,12 @@ public class JeVois {
             backgroundUpdate();
         }
     });
+
+    public synchronized static JeVois getInstance() {
+        if (instance == null) {
+            instance = new JeVois();
+        }
+
+        return instance;
+    }
 }
