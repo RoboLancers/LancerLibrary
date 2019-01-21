@@ -1,10 +1,8 @@
 package com.robolancers.lib.wrappers.motors;
 
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
+import com.revrobotics.*;
 import com.robolancers.lib.enums.GainType;
+import edu.wpi.first.wpilibj.DriverStation;
 import org.ghrobotics.lib.mathematics.units.SIUnit;
 import org.ghrobotics.lib.mathematics.units.derivedunits.Velocity;
 import org.ghrobotics.lib.mathematics.units.derivedunits.VelocityKt;
@@ -14,7 +12,7 @@ import org.ghrobotics.lib.mathematics.units.nativeunits.*;
 import org.ghrobotics.lib.wrappers.FalconMotor;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements FalconMotor<T> {
     private CANPIDController canpidController;
     private CANEncoder canEncoder;
@@ -81,20 +79,30 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
         );
     }
 
+    public static void checkCANError(CANError canError, String methodName){
+        if(canError != CANError.kOK){
+            DriverStation.reportError("(SparkMax) " + canError.name() + " in " + methodName, false);
+        }
+    }
+
     public void setGain(GainType type, double gain){
+        CANError canError = CANError.kError;
+
         switch (type){
             case FF:
-                canpidController.setFF(gain);
+                canError = canpidController.setFF(gain);
                 break;
             case P:
-                canpidController.setP(gain);
+                canError = canpidController.setP(gain);
                 break;
             case I:
-                canpidController.setI(gain);
+                canError = canpidController.setI(gain);
                 break;
             case D:
-                canpidController.setD(gain);
+                canError = canpidController.setD(gain);
                 break;
         }
+
+        checkCANError(canError, "setGain");
     }
 }
