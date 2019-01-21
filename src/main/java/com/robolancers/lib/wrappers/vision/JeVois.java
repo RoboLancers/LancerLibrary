@@ -1,4 +1,4 @@
-package com.robolancers.lib.vision;
+package com.robolancers.lib.wrappers.vision;
 
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
