@@ -67,15 +67,15 @@ public class JeVois {
      * then fires up the user's program and begins listening for target info packets in the background
      */
     public JeVois() {
-        this(false); //Default - stream disabled, just run serial.
+        this(false, SerialPort.Port.kUSB); //Default - stream disabled, just run serial.
     }
 
     /**
      * Constructor (more complex). Opens a USB serial port to the JeVois camera, sends a few test commands checking for error,
      * then fires up the user's program and begins listening for target info packets in the background.
-     * Pass TRUE to additionaly enable a USB camera stream of what the vision camera is seeing.
+     * Pass TRUE to additionally enable a USB camera stream of what the vision camera is seeing.
      */
-    public JeVois(boolean useUSBStream) {
+    public JeVois(boolean useUSBStream, SerialPort.Port port) {
         int retry_counter = 0;
 
         //Retry strategy to get this serial port open.
@@ -84,7 +84,7 @@ public class JeVois {
         while(visionPort == null && retry_counter++ < 10){
             try {
                 System.out.print("Creating JeVois SerialPort...");
-                visionPort = new SerialPort(BAUD_RATE,SerialPort.Port.kUSB);
+                visionPort = new SerialPort(BAUD_RATE,port);
                 System.out.println("SUCCESS!!");
             } catch (Exception e) {
                 System.out.println("FAILED!!");
