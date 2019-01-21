@@ -57,16 +57,15 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
     @NotNull
     @Override
     public Velocity<T> getVelocity() {
-        return NativeUnitVelocityKt.fromNativeUnitVelocity(
-                VelocityKt.getVelocity(NativeUnitKt.getSTU(canEncoder.getVelocity() / 60)),
-                nativeUnitModel
+        return nativeUnitModel.fromNativeUnitVelocity(
+                VelocityKt.getVelocity(NativeUnitKt.getSTU(canEncoder.getVelocity() / 60))
         );
     }
 
     @Override
     public void setVelocity(@NotNull Velocity<T> velocity) {
         canpidController.setReference(
-                NativeUnitVelocityKt.toNativeUnitVelocity(velocity, nativeUnitModel).getValue() * 60,
+                nativeUnitModel.toNativeUnitVelocity(velocity).getValue() * 60,
                 ControlType.kVelocity
         );
     }
@@ -74,7 +73,7 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
     @Override
     public void setVelocityAndArbitraryFeedForward(@NotNull Velocity<T> velocity, double arbitraryFeedForward) {
         canpidController.setReference(
-                NativeUnitVelocityKt.toNativeUnitVelocity(velocity, nativeUnitModel).getValue() * 60,
+                nativeUnitModel.toNativeUnitVelocity(velocity).getValue() * 60,
                 ControlType.kVelocity,
                 0,
                 arbitraryFeedForward * getBusVoltage()
