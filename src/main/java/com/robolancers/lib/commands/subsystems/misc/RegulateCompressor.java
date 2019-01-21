@@ -1,6 +1,6 @@
 package com.robolancers.lib.commands.subsystems.misc;
 
-import com.robolancers.lib.subsystem.misc.Pneumatic;
+import com.robolancers.lib.subsystems.misc.Pneumatic;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class RegulateCompressor extends Command {

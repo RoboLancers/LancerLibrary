@@ -1,4 +1,4 @@
-package com.robolancers.lib.subsystem.misc;
+package com.robolancers.lib.subsystems.misc;
 
 import com.robolancers.lib.commands.subsystems.misc.RegulateCompressor;
 import edu.wpi.first.wpilibj.Compressor;
