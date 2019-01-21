@@ -1,7 +1,6 @@
 package com.robolancers.lib.subsystem.drivetrain;
 
 import com.robolancers.lib.auto.TrajectoryTrackerCommand;
-import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import kotlin.ranges.RangesKt;
@@ -9,7 +8,6 @@ import org.ghrobotics.lib.localization.Localization;
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d;
 import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature;
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory;
-import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectoryKt;
 import org.ghrobotics.lib.subsystems.drive.DifferentialTrackerDriveBase;
 import org.jetbrains.annotations.NotNull;
 
