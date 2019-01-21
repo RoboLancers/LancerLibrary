@@ -4,6 +4,7 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
+import com.robolancers.lib.enums.GainType;
 import org.ghrobotics.lib.mathematics.units.SIUnit;
 import org.ghrobotics.lib.mathematics.units.derivedunits.Velocity;
 import org.ghrobotics.lib.mathematics.units.derivedunits.VelocityKt;
@@ -78,5 +79,22 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
                 0,
                 arbitraryFeedForward * getBusVoltage()
         );
+    }
+
+    public void setGain(GainType type, double gain){
+        switch (type){
+            case FF:
+                canpidController.setFF(gain);
+                break;
+            case P:
+                canpidController.setP(gain);
+                break;
+            case I:
+                canpidController.setI(gain);
+                break;
+            case D:
+                canpidController.setD(gain);
+                break;
+        }
     }
 }
