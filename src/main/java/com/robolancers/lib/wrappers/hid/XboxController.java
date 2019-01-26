@@ -5,6 +5,9 @@ import edu.wpi.first.wpilibj.command.Command;
 
 @SuppressWarnings("unused")
 public class XboxController extends BaseController {
+    private static final int NUMBER_OF_AXIS = 6;
+    private TriggerButton[] triggerButtons;
+
     public enum Axis {
         LEFT_X(0),
         LEFT_Y(1, true),
@@ -45,8 +48,23 @@ public class XboxController extends BaseController {
         }
     }
 
+    public enum Trigger {
+        LEFT_TRIGGER_BUTTON(Axis.LEFT_TRIGGER.port),
+        RIGHT_TRIGGER_BUTTON(Axis.RIGHT_TRIGGER.port);
+
+        int port;
+
+        Trigger(int port){
+            this.port = port;
+        }
+    }
+
     public XboxController(int port) {
         super(port);
+
+        for(int i = 0; i < triggerButtons.length; i++){
+            triggerButtons[i] = new TriggerButton(joystick, i);
+        }
     }
 
     public double getAxisValue(Axis axis){
@@ -57,8 +75,18 @@ public class XboxController extends BaseController {
         return joystick.getRawButton(button.port);
     }
 
+    public XboxController whileHeld(Trigger trigger, Command command){
+        triggerButtons[trigger.port].whileActive(command);
+        return this;
+    }
+
     public XboxController whileHeld(Button button, Command command){
         buttons[button.port].whileHeld(command);
+        return this;
+    }
+
+    public XboxController whenPressed(Trigger trigger, Command command){
+        triggerButtons[trigger.port].whenActive(command);
         return this;
     }
 
@@ -67,13 +95,28 @@ public class XboxController extends BaseController {
         return this;
     }
 
+    public XboxController whenReleased(Trigger trigger, Command command){
+        triggerButtons[trigger.port].whenInactive(command);
+        return this;
+    }
+
     public XboxController whenReleased(Button button, Command command){
         buttons[button.port].whenReleased(command);
         return this;
     }
 
+    public XboxController toggleWhenPressed(Trigger trigger, Command command){
+        triggerButtons[trigger.port].toggleWhenActive(command);
+        return this;
+    }
+
     public XboxController toggleWhenPressed(Button button, Command command){
         buttons[button.port].toggleWhenPressed(command);
+        return this;
+    }
+
+    public XboxController cancelWhenPressed(Trigger trigger, Command command){
+        triggerButtons[trigger.port].cancelWhenActive(command);
         return this;
     }
 
