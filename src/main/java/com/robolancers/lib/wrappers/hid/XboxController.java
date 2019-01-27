@@ -62,6 +62,8 @@ public class XboxController extends BaseController {
     public XboxController(int port) {
         super(port);
 
+        triggerButtons = new TriggerButton[NUMBER_OF_AXIS];
+
         for(int i = 0; i < triggerButtons.length; i++){
             triggerButtons[i] = new TriggerButton(joystick, i);
         }
