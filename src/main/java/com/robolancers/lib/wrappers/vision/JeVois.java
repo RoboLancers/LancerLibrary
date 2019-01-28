@@ -15,7 +15,7 @@ public class JeVois {
     private static final int BAUD_RATE = 115200;
 
     // MJPG Streaming Constants
-    private static final int MJPG_STREAM_PORT = 1180;
+    private static int MJPG_STREAM_PORT = 1180;
 
     // Packet format constants
     private static final String PACKET_START_CHAR = "{";
@@ -304,6 +304,8 @@ public class JeVois {
             camStreamRunning = true;
             dataStreamRunning = true;
             System.out.println("SUCCESS!!");
+
+            MJPG_STREAM_PORT++;
         } catch (Exception e) {
             DriverStation.reportError("Cannot start camera stream from JeVois", false);
             e.printStackTrace();

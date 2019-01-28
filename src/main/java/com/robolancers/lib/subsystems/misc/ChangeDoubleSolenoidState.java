@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
+@SuppressWarnings("unused")
 public class ChangeDoubleSolenoidState extends InstantCommand {
     private DoubleSolenoid doubleSolenoid;
     private DoubleSolenoid.Value value;
