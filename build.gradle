@@ -6,9 +6,7 @@ plugins {
 }
 
 group 'com.robolancers.lib'
-version '1.0-SNAPSHOT'
-
-sourceCompatibility = 1.8
+version '2019.1.27'
 
 repositories {
     mavenCentral()
@@ -20,7 +18,7 @@ dependencies {
     compile wpi.deps.vendor.java()
 
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.3.11'
-    compile('com.github.5190GreenHopeRobotics:FalconLibrary:a4fb6dfa7a')
+    compile('com.github.5190GreenHopeRobotics:FalconLibrary:c4d20e5994')
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
@@ -29,7 +27,7 @@ publishing {
         maven(MavenPublication) {
             groupId = "com.robolancers"
             artifactId = "LancerLibrary"
-            version = "2019.1.21"
+            version = "2019.1.27"
 
             from components.java
         }
