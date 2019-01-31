@@ -5,8 +5,7 @@ import edu.wpi.first.wpilibj.command.Command;
 
 @SuppressWarnings("unused")
 public class XboxController extends BaseController {
-    private static final int NUMBER_OF_AXIS = 6;
-    private TriggerButton[] triggerButtons;
+    private static final int NUMBER_OF_AXIS = Axis.values().length;
 
     public enum Axis {
         LEFT_X(0),
@@ -53,9 +52,15 @@ public class XboxController extends BaseController {
         RIGHT_TRIGGER_BUTTON(Axis.RIGHT_TRIGGER.port);
 
         int port;
+        boolean negative;
 
         Trigger(int port){
+            this(port, false);
+        }
+
+        Trigger(int port, boolean negative){
             this.port = port;
+            this.negative = negative;
         }
     }
 
@@ -65,7 +70,7 @@ public class XboxController extends BaseController {
         triggerButtons = new TriggerButton[NUMBER_OF_AXIS];
 
         for(int i = 0; i < triggerButtons.length; i++){
-            triggerButtons[i] = new TriggerButton(joystick, i);
+            triggerButtons[i] = new TriggerButton(joystick, i, Trigger.values()[i].negative);
         }
     }
 

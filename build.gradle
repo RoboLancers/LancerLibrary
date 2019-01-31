@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.robolancers.lib'
-version '2019.1.27'
+version '2019.1.31'
 
 repositories {
     mavenCentral()
@@ -27,7 +27,7 @@ publishing {
         maven(MavenPublication) {
             groupId = "com.robolancers"
             artifactId = "LancerLibrary"
-            version = "2019.1.27"
+            version = "2019.1.31"
 
             from components.java
         }
