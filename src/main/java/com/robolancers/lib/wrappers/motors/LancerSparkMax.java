@@ -80,7 +80,7 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
     }
 
     public T getSensorPosition(){
-        return nativeUnitModel.fromNativeUnit(NativeUnitKt.getSTU(canEncoder.getPosition()));
+        return nativeUnitModel.fromNativeUnitPosition(NativeUnitKt.getSTU(canEncoder.getPosition()));
     }
 
     public static void checkCANError(CANError canError, String methodName){
