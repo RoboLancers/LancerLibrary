@@ -9,7 +9,7 @@ public class TriggerButton extends Trigger {
     private int port;
     private boolean negative;
 
-    public TriggerButton(Joystick joystick, int port, boolean negative){
+    TriggerButton(Joystick joystick, int port, boolean negative){
         this.joystick = joystick;
         this.port = port;
         this.negative = negative;

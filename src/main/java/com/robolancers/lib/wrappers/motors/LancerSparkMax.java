@@ -57,7 +57,7 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
     @Override
     public Velocity<T> getVelocity() {
         return nativeUnitModel.fromNativeUnitVelocity(
-                VelocityKt.getVelocity(NativeUnitKt.getSTU(canEncoder.getVelocity() / 60))
+                VelocityKt.getVelocity(NativeUnitKt.getNativeUnits(canEncoder.getVelocity() / 60))
         );
     }
 
@@ -80,7 +80,7 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
     }
 
     public T getSensorPosition(){
-        return nativeUnitModel.fromNativeUnitPosition(NativeUnitKt.getSTU(canEncoder.getPosition()));
+        return nativeUnitModel.fromNativeUnitPosition(NativeUnitKt.getNativeUnits(canEncoder.getPosition()));
     }
 
     public static void checkCANError(CANError canError, String methodName){
