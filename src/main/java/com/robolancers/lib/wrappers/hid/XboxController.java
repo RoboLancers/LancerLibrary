@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.command.Command;
 
 @SuppressWarnings("unused")
 public class XboxController extends BaseController {
-    private static final int NUMBER_OF_AXIS = Axis.values().length;
+    private static final int NUMBER_OF_AXIS = Trigger.values().length;
 
     public enum Axis {
         LEFT_X(0),
