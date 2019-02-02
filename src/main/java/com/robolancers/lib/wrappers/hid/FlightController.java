@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.command.Command;
 @SuppressWarnings("unused")
 public class FlightController extends BaseController{
     private static final int NUMBER_OF_AXIS = Trigger.values().length;
+    private static final double DEADZONE = 0.1;
 
     public enum Axis {
         X(0),
