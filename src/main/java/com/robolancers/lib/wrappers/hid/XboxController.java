@@ -23,7 +23,7 @@ public class XboxController extends BaseController {
             this(port, false);
         }
 
-        Axis(int port, boolean inverted){
+         Axis(int port, boolean inverted){
             this.port = port;
             this.inverted = inverted ? -1 : 1;
         }
