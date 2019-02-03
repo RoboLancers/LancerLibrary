@@ -40,31 +40,7 @@ public abstract class TankDriveSubsystem extends Subsystem implements Differenti
     }
 
     public void arcadeDrive(double linearPercent, double rotationPercent){
-        double maxInput = Math.signum(Math.max(Math.abs(linearPercent), Math.abs(rotationPercent)));
-
-        double leftMotorOutput, rightMotorOutput;
-
-        if (linearPercent >= 0.0) {
-            // First quadrant, else second quadrant
-            if (rotationPercent >= 0.0) {
-                leftMotorOutput = maxInput;
-                rightMotorOutput = linearPercent - rotationPercent;
-            } else {
-                leftMotorOutput = linearPercent + rotationPercent;
-                rightMotorOutput = maxInput;
-            }
-        } else {
-            // Third quadrant, else fourth quadrant
-            if (rotationPercent >= 0.0) {
-                leftMotorOutput = linearPercent + rotationPercent;
-                rightMotorOutput = maxInput;
-            } else {
-                leftMotorOutput = maxInput;
-                rightMotorOutput = linearPercent - rotationPercent;
-            }
-        }
-
-        tankDrive(leftMotorOutput, rightMotorOutput);
+        tankDrive(linearPercent + rotationPercent, linearPercent - rotationPercent);
     }
 
     public void curvatureDrive(double linearPercent, double curvaturePercent, boolean isQuickTurn) {
