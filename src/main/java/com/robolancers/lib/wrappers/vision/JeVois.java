@@ -49,7 +49,6 @@ public class JeVois {
     // Packet rate performance tracking
     private double packetRxTime = 0;
     private double prevPacketRxTime = 0;
-    private double packetRate_PPS = 0;
 
     // Most recently seen target information
     private boolean targetVisible;
@@ -57,9 +56,6 @@ public class JeVois {
     private double targetAngle;
 
     // Info about the JeVois performance & status
-    private double jeVoisCpuTempC;
-    private double jeVoisCpuLoadPct;
-    private double jeVoisFramerateFPS;
     private double packetRxRatePPS;
 
     /**
@@ -202,27 +198,6 @@ public class JeVois {
      */
     public boolean isTargetVisible() {
         return targetVisible;
-    }
-
-    /**
-     * Returns the JeVois's most recently reported CPU Temperature in deg C
-     */
-    public double getJeVoisCPUTemp_C(){
-        return jeVoisCpuTempC;
-    }
-
-    /**
-     * Returns the JeVois's most recently reported CPU Load in percent of max
-     */
-    public double getJeVoisCpuLoad_pct(){
-        return jeVoisCpuLoadPct;
-    }
-
-    /**
-     * Returns the JeVois's most recently reported pipeline framerate in Frames per second
-     */
-    public double getJeVoisFramerate_FPS(){
-        return jeVoisFramerateFPS;
     }
 
     /**
@@ -528,7 +503,6 @@ public class JeVois {
      */
     public int parsePacket(String pkt, double rx_Time){
         //Parsing constants. These must be aligned with JeVois code.
-        final int NUM_EXPECTED_TOKENS = 3;
         final int TGT_VISIBLE_TOKEN_IDX = 0;
         final int TGT_DISTANCE_TOKEN_IDX = 1;
         final int TGT_ANGLE_TOKEN_IDX = 2;
@@ -537,7 +511,7 @@ public class JeVois {
         String[] tokens = pkt.split(",");
 
         //Check there were enough substrings found
-        if(tokens.length < NUM_EXPECTED_TOKENS){
+        if(tokens.length < PACKET_NUM_EXPECTED_FIELDS){
             DriverStation.reportError("Got malformed vision packet. Expected 8 tokens, but only found " + tokens.length + ". Packet Contents: " + pkt, false);
             return -1;
         }
