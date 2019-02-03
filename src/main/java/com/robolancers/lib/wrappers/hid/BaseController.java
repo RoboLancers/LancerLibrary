@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
 abstract class BaseController {
     private static final int NUMBER_OF_BUTTONS = 13;
+    double deadzone = 0;
 
     Joystick joystick;
     Button[] buttons;

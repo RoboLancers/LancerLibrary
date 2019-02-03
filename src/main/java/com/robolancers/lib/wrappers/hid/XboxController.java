@@ -3,10 +3,9 @@ package com.robolancers.lib.wrappers.hid;
 import com.robolancers.lib.Utilities;
 import edu.wpi.first.wpilibj.command.Command;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class XboxController extends BaseController {
     private static final int NUMBER_OF_AXIS = Axis.values().length;
-    private static final double DEADZONE = 0.15;
 
     public enum Axis {
         LEFT_X(0),
@@ -70,6 +69,10 @@ public class XboxController extends BaseController {
     }
 
     public XboxController(int port) {
+        this(port, 0.15);
+    }
+
+    public XboxController(int port, double deadzone) {
         super(port);
 
         triggerButtons = new TriggerButton[NUMBER_OF_AXIS];
@@ -77,10 +80,12 @@ public class XboxController extends BaseController {
         for(int i = 0; i < triggerButtons.length; i++){
             triggerButtons[i] = new TriggerButton(joystick, i, Trigger.values()[i].negative);
         }
+
+        this.deadzone = deadzone;
     }
 
     public double getAxisValue(Axis axis){
-        return Utilities.applyDeadband(axis.inverted * joystick.getRawAxis(axis.port), DEADZONE);
+        return Utilities.applyDeadband(axis.inverted * joystick.getRawAxis(axis.port), deadzone);
     }
 
     public boolean getButtonState(Button button){
