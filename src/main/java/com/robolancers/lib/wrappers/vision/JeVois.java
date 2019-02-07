@@ -3,6 +3,7 @@ package com.robolancers.lib.wrappers.vision;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoMode.PixelFormat;
+import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
@@ -16,6 +17,7 @@ public class JeVois {
 
     // MJPG Streaming Constants
     private static int MJPG_STREAM_PORT = 1180;
+    private static int CAMERA_NUMBER = 0;
 
     // Packet format constants
     private static final String PACKET_START_CHAR = "{";
@@ -211,6 +213,9 @@ public class JeVois {
         }
     }
 
+    public VideoSource getVisionCam(){
+        return visionCam;
+    }
 
     /**
      * This is the main periodic update function for the Listener. It is intended
@@ -272,7 +277,7 @@ public class JeVois {
     private void startCameraStream(){
         try{
             System.out.print("Starting JeVois Cam Stream...");
-            visionCam = new UsbCamera("VisionProcCam", 0);
+            visionCam = new UsbCamera("VisionProcCam", CAMERA_NUMBER);
             visionCam.setVideoMode(PixelFormat.kYUYV, STREAM_WIDTH_PX, STREAM_HEIGHT_PX, STREAM_RATE_FPS);
             camServer = new MjpegServer("VisionCamServer", MJPG_STREAM_PORT);
             camServer.setSource(visionCam);
@@ -280,6 +285,7 @@ public class JeVois {
             dataStreamRunning = true;
             System.out.println("SUCCESS!!");
 
+            CAMERA_NUMBER++;
             MJPG_STREAM_PORT++;
         } catch (Exception e) {
             DriverStation.reportError("Cannot start camera stream from JeVois", false);
