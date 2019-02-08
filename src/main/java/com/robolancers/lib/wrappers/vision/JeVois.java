@@ -48,17 +48,10 @@ public class JeVois {
     private boolean camStreamRunning;
     private boolean visionOnline;
 
-    // Packet rate performance tracking
-    private double packetRxTime = 0;
-    private double prevPacketRxTime = 0;
-
     // Most recently seen target information
     private boolean targetVisible;
     private double targetDistance;
     private double targetAngle;
-
-    // Info about the JeVois performance & status
-    private double packetRxRatePPS;
 
     /**
      * Constructor (simple). Opens a USB serial port to the JeVois camera, sends a few test commands checking for error,
@@ -82,7 +75,7 @@ public class JeVois {
         while(visionPort == null && retry_counter++ < 10){
             try {
                 System.out.print("Creating JeVois SerialPort...");
-                visionPort = new SerialPort(BAUD_RATE,port);
+                visionPort = new SerialPort(BAUD_RATE, port);
                 System.out.println("SUCCESS!!");
             } catch (Exception e) {
                 System.out.println("FAILED!!");
@@ -202,17 +195,6 @@ public class JeVois {
         return targetVisible;
     }
 
-    /**
-     * Returns the roboRIO measured serial packet receive rate in packets per second
-     */
-    public int getPacketRxRate_PPS(){
-        if(visionOnline){
-            return (int)Math.round(packetRxRatePPS);
-        } else {
-            return 0;
-        }
-    }
-
     public VideoSource getVisionCam(){
         return visionCam;
     }
@@ -223,21 +205,11 @@ public class JeVois {
      */
     private void backgroundUpdate(){
         // Grab packets and parse them.
-        String packet;
-
-        prevPacketRxTime = packetRxTime;
-
         sendCmd("target");
-        packet = blockAndGetPacket(2.0);
+        String packet = blockAndGetPacket(2.0);
 
         if(packet != null){
-            packetRxTime = Timer.getFPGATimestamp();
-            if(parsePacket(packet, packetRxTime) == 0){
-                visionOnline = true;
-                packetRxRatePPS = 1.0/(packetRxTime - prevPacketRxTime);
-            } else {
-                visionOnline = false;
-            }
+            visionOnline = parsePacket(packet) == 0;
         } else {
             visionOnline = false;
             DriverStation.reportWarning("Cannot get packet from JeVois Vision Processor", false);
@@ -270,17 +242,19 @@ public class JeVois {
         dataStreamRunning = false;
     }
 
-
     /**
      * Open an Mjpeg streamer from the JeVois camera
      */
     private void startCameraStream(){
         try{
-            System.out.print("Starting JeVois Cam Stream...");
-            visionCam = new UsbCamera("VisionProcCam", CAMERA_NUMBER);
+            System.out.println("Starting JeVois Cam Stream...");
+
+            visionCam = new UsbCamera("JeVois " + CAMERA_NUMBER, CAMERA_NUMBER);
             visionCam.setVideoMode(PixelFormat.kYUYV, STREAM_WIDTH_PX, STREAM_HEIGHT_PX, STREAM_RATE_FPS);
-            camServer = new MjpegServer("VisionCamServer", MJPG_STREAM_PORT);
+
+            camServer = new MjpegServer("JeVoisServer" + CAMERA_NUMBER, MJPG_STREAM_PORT);
             camServer.setSource(visionCam);
+
             camStreamRunning = true;
             dataStreamRunning = true;
             System.out.println("SUCCESS!!");
@@ -507,7 +481,7 @@ public class JeVois {
      * Parse individual numbers from a packet
      * @param pkt Packet received
      */
-    public int parsePacket(String pkt, double rx_Time){
+    public int parsePacket(String pkt){
         //Parsing constants. These must be aligned with JeVois code.
         final int TGT_VISIBLE_TOKEN_IDX = 0;
         final int TGT_DISTANCE_TOKEN_IDX = 1;
