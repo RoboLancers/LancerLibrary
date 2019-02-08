@@ -97,8 +97,12 @@ public class FlightController extends BaseController{
         return Utilities.applyDeadband(axis.inverted * joystick.getRawAxis(axis.port), deadzone);
     }
 
-    public boolean getButtonState(Button button){
+    public boolean getState(Button button){
         return joystick.getRawButton(button.port);
+    }
+
+    public boolean getState(Trigger trigger){
+        return triggerButtons[trigger.port].get();
     }
 
     public FlightController whileHeld(Trigger trigger, Command command){
