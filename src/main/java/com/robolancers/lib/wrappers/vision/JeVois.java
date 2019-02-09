@@ -25,16 +25,10 @@ public class JeVois {
     private static final String PACKET_DILEM_CHAR = ",";
     private static final int PACKET_NUM_EXPECTED_FIELDS = 3;
 
-    // Configure the camera to stream debug images or not.
-    private boolean broadcastUSBCam = false;
-
-    // When not streaming, use this mapping
-    private static final int NO_STREAM_MAPPING = 1;
-
     // When streaming, use this set of configuration
-    private static final int STREAM_WIDTH_PX = 320;
-    private static final int STREAM_HEIGHT_PX = 240;
-    private static final int STREAM_RATE_FPS = 30;
+    private static final int STREAM_WIDTH_PX = 160;
+    private static final int STREAM_HEIGHT_PX = 120;
+    private static final int STREAM_RATE_FPS = 15;
 
     // Serial port used for getting target data from JeVois
     private SerialPort visionPort;
@@ -52,14 +46,6 @@ public class JeVois {
     private boolean targetVisible;
     private double targetDistance;
     private double targetAngle;
-
-    /**
-     * Constructor (simple). Opens a USB serial port to the JeVois camera, sends a few test commands checking for error,
-     * then fires up the user's program and begins listening for target info packets in the background
-     */
-    public JeVois() {
-        this(false, SerialPort.Port.kUSB); //Default - stream disabled, just run serial.
-    }
 
     /**
      * Constructor (more complex). Opens a USB serial port to the JeVois camera, sends a few test commands checking for error,
@@ -98,72 +84,24 @@ public class JeVois {
             return;
         }
 
-        // Ensure the JeVois is starting with the stream off.
-        // stopDataOnlyStream();
-
-        setCameraStreamActive(useUSBStream);
         start();
 
         //Start listening for packets
-        // packetListenerThread.setDaemon(true);
+        packetListenerThread.setDaemon(true);
         packetListenerThread.start();
     }
 
     public void start(){
-        if(broadcastUSBCam){
-            //Start streaming the JeVois via webcam
-            //This auto-starts the serial stream
-            startCameraStream();
-        } else {
-            startDataOnlyStream();
-        }
+        startCameraStream();
     }
 
     public void stop(){
-        if(broadcastUSBCam){
-            //Start streaming the JeVois via webcam
-            //This auto-starts the serial stream
-            stopCameraStream();
-        } else {
-            stopDataOnlyStream();
-        }
-    }
-
-    /**
-     * Send commands to the JeVois to configure it for image-processing friendly parameters
-     */
-    public void setCamVisionProcMode() {
-        if (visionPort != null){
-            sendCmdAndCheck("setcam autoexp 1"); //Disable auto exposure
-            sendCmdAndCheck("setcam absexp 25"); //Force exposure to a low value for vision processing
-        }
-    }
-
-    /**
-     * Send parameters to the camera to configure it for a human-readable image
-     */
-    public void setCamHumanDriverMode() {
-        if (visionPort != null){
-            sendCmdAndCheck("setcam autoexp 0"); //Enable AutoExposure
-        }
+        stopCameraStream();
     }
 
     /*
      * Main getters/setters
      */
-
-    /**
-     * Set to true to enable the camera stream, or set to false to stream serial-packets only.
-     * Note this cannot be changed at runtime due to jevois constraints. You must stop whatever processing
-     * is going on first.
-     */
-    public void setCameraStreamActive(boolean active){
-        if(!dataStreamRunning){
-            broadcastUSBCam = active;
-        } else {
-            DriverStation.reportError("Attempt to change cal stream mode while JeVois is still running. This is disallowed.", false);
-        }
-    }
 
     /**
      * Returns the distance the target is away from the camera
@@ -228,20 +166,6 @@ public class JeVois {
         return retval;
     }
 
-    private void startDataOnlyStream(){
-        //Send serial commands to start the streaming of target info
-        sendCmdAndCheck("setmapping " + NO_STREAM_MAPPING);
-        sendCmdAndCheck("streamon");
-        dataStreamRunning = true;
-    }
-
-    private void stopDataOnlyStream(){
-        //Send serial commands to stop the streaming of target info
-        sendCmdAndCheck("streamoff");
-        visionPort.reset();
-        dataStreamRunning = false;
-    }
-
     /**
      * Open an Mjpeg streamer from the JeVois camera
      */
@@ -289,7 +213,7 @@ public class JeVois {
 
         if(visionPort != null) {
             bytes = visionPort.writeString(cmd + "\n");
-            System.out.println("wrote " + bytes + "/" + (cmd.length() + 1) + " bytes, cmd: " + cmd);
+            // System.out.println("wrote " + bytes + "/" + (cmd.length() + 1) + " bytes, cmd: " + cmd);
         }
 
         return bytes;
