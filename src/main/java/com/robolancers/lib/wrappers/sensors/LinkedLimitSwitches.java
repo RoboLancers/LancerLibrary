@@ -19,4 +19,8 @@ public class LinkedLimitSwitches {
     public boolean get(){
         return Stream.of(limitSwitches).anyMatch(DigitalInput::get);
     }
+
+    public boolean get(int index) {
+        return limitSwitches[index].get();
+    }
 }
