@@ -1,5 +1,6 @@
 package com.robolancers.lib.auto;
 
+import com.robolancers.lib.subsystems.drivetrain.TankDriveSubsystem;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import org.ghrobotics.lib.debug.LiveDashboard;
@@ -22,16 +23,17 @@ public class TrajectoryTrackerCommand extends Command {
     private Localization localization;
     private boolean reset;
 
-    public TrajectoryTrackerCommand(Subsystem tankDriveSubsystem, TrajectoryTrackerDriveBase driveBase, Supplier<TimedTrajectory<Pose2dWithCurvature>> trajectorySource){
+    public TrajectoryTrackerCommand(TankDriveSubsystem tankDriveSubsystem, TrajectoryTrackerDriveBase driveBase, Supplier<TimedTrajectory<Pose2dWithCurvature>> trajectorySource){
         this(tankDriveSubsystem, driveBase, trajectorySource, false);
     }
 
-    public TrajectoryTrackerCommand(Subsystem tankDriveSubsystem, TrajectoryTrackerDriveBase driveBase, Supplier<TimedTrajectory<Pose2dWithCurvature>> trajectorySource, boolean reset){
+    public TrajectoryTrackerCommand(TankDriveSubsystem tankDriveSubsystem, TrajectoryTrackerDriveBase driveBase, Supplier<TimedTrajectory<Pose2dWithCurvature>> trajectorySource, boolean reset){
         requires(tankDriveSubsystem);
 
         this.trajectoryTracker = driveBase.getTrajectoryTracker();
         this.trajectorySource = trajectorySource;
         this.driveBase = driveBase;
+        this.localization = tankDriveSubsystem.getLocalization();
         this.reset = reset;
     }
 
