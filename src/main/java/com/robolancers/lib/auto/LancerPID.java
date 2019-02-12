@@ -31,6 +31,8 @@ public class LancerPID {
 
     private double setpointRange = 0;
 
+    private double error;
+
     //**********************************
     // Constructor functions
     //**********************************
@@ -272,7 +274,7 @@ public class LancerPID {
         }
 
         // Do the simple parts of the calculations
-        double error = setpoint - actual;
+        error = setpoint - actual;
 
         // Calculate F output. Notice, this depends only on the setpoint, and not the error.
         Foutput = F * setpoint;
@@ -365,6 +367,10 @@ public class LancerPID {
      */
     public double getOutput(double actual) {
         return getOutput(actual, setpoint);
+    }
+
+    public double getError(){
+        return error;
     }
 
     /**
