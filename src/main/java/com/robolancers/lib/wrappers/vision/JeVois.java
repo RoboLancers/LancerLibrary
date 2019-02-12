@@ -4,11 +4,13 @@ import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoMode.PixelFormat;
 import edu.wpi.cscore.VideoSource;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused", "WeakerAccess", "UnusedReturnValue", "SameParameterValue"})
 public class JeVois {
@@ -16,8 +18,8 @@ public class JeVois {
     private static final int BAUD_RATE = 115200;
 
     // MJPG Streaming Constants
-    private static int MJPG_STREAM_PORT = 1180;
-    private static int CAMERA_NUMBER = 0;
+    private static AtomicInteger MJPG_STREAM_PORT = new AtomicInteger(1180);
+    private static AtomicInteger CAMERA_NUMBER = new AtomicInteger(0);
 
     // Packet format constants
     private static final String PACKET_START_CHAR = "{";
@@ -26,9 +28,9 @@ public class JeVois {
     private static final int PACKET_NUM_EXPECTED_FIELDS = 3;
 
     // When streaming, use this set of configuration
-    private static final int STREAM_WIDTH_PX = 160;
-    private static final int STREAM_HEIGHT_PX = 120;
-    private static final int STREAM_RATE_FPS = 15;
+    private static final int STREAM_WIDTH_PX = 320;
+    private static final int STREAM_HEIGHT_PX = 240;
+    private static final int STREAM_RATE_FPS = 30;
 
     // Serial port used for getting target data from JeVois
     private SerialPort visionPort;
@@ -38,7 +40,6 @@ public class JeVois {
     private MjpegServer camServer;
 
     // Status variables
-    private boolean dataStreamRunning;
     private boolean camStreamRunning;
     private boolean visionOnline;
 
@@ -52,7 +53,7 @@ public class JeVois {
      * then fires up the user's program and begins listening for target info packets in the background.
      * Pass TRUE to additionally enable a USB camera stream of what the vision camera is seeing.
      */
-    public JeVois(boolean useUSBStream, SerialPort.Port port) {
+    public JeVois(SerialPort.Port port) {
         int retry_counter = 0;
 
         //Retry strategy to get this serial port open.
@@ -84,19 +85,11 @@ public class JeVois {
             return;
         }
 
-        start();
+        startCameraStream();
 
         //Start listening for packets
         packetListenerThread.setDaemon(true);
         packetListenerThread.start();
-    }
-
-    public void start(){
-        startCameraStream();
-    }
-
-    public void stop(){
-        stopCameraStream();
     }
 
     /*
@@ -173,33 +166,17 @@ public class JeVois {
         try{
             System.out.println("Starting JeVois Cam Stream...");
 
-            visionCam = new UsbCamera("JeVois " + CAMERA_NUMBER, CAMERA_NUMBER);
+            visionCam = CameraServer.getInstance().startAutomaticCapture();
             visionCam.setVideoMode(PixelFormat.kYUYV, STREAM_WIDTH_PX, STREAM_HEIGHT_PX, STREAM_RATE_FPS);
 
-            camServer = new MjpegServer("JeVoisServer" + CAMERA_NUMBER, MJPG_STREAM_PORT);
-            camServer.setSource(visionCam);
+            //camServer = new MjpegServer("JeVoisServer" + CAMERA_NUMBER.getAndIncrement(), MJPG_STREAM_PORT.getAndIncrement());
+            //camServer.setSource(visionCam);
 
             camStreamRunning = true;
-            dataStreamRunning = true;
             System.out.println("SUCCESS!!");
-
-            CAMERA_NUMBER++;
-            MJPG_STREAM_PORT++;
         } catch (Exception e) {
             DriverStation.reportError("Cannot start camera stream from JeVois", false);
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * Cease the operation of the camera stream. Unknown if needed.
-     */
-    private void stopCameraStream(){
-        if(camStreamRunning){
-            camServer.close();
-            visionCam.close();
-            camStreamRunning = false;
-            dataStreamRunning = false;
         }
     }
 
