@@ -9,18 +9,19 @@ public class LancerPID {
     private double target = 0;
     private double error;
 
+    private boolean firstRun;
     private double lastActual = 0;
 
     public LancerPID(double p, double i, double d) {
         kP = p;
         kI = i;
         kD = d;
+
+        firstRun = true;
     }
 
     public LancerPID(double p, double i, double d, double f) {
-        kP = p;
-        kI = i;
-        kD = d;
+        this(p, i, d);
         kF = f;
     }
 
@@ -31,9 +32,14 @@ public class LancerPID {
     public double getOutput(double actual) {
         error = target - actual;
 
+        if(firstRun) {
+            lastActual = actual;
+            firstRun = false;
+        }
+
         kFoutput = kF * target;
         kPoutput = kP * error;
-        this.kIoutput += error * time;
+        kIoutput += error * time;
         kDoutput = kD * ((actual - lastActual)/ time);
 
         output = kFoutput + kPoutput + kIoutput + kDoutput;
@@ -46,4 +52,9 @@ public class LancerPID {
         return error;
     }
 
+    public void reset() {
+        kIoutput = 0;
+        lastActual = 0;
+        firstRun = true;
+    }
 }
