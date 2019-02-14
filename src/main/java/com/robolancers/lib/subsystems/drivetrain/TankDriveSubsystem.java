@@ -19,6 +19,10 @@ public abstract class TankDriveSubsystem extends Subsystem implements Differenti
 
     private double kStatic = 0.1;
 
+    public void setkStatic(double kStatic){
+        this.kStatic = kStatic;
+    }
+
     public abstract Localization getLocalization();
 
     @NotNull
