@@ -17,6 +17,8 @@ public abstract class TankDriveSubsystem extends Subsystem implements Differenti
     private static double kQuickStopAlpha = DifferentialDrive.kDefaultQuickStopAlpha;
     private double quickStopAccumulator = 0;
 
+    private double kStatic = 0.1;
+
     public abstract Localization getLocalization();
 
     @NotNull
@@ -35,8 +37,8 @@ public abstract class TankDriveSubsystem extends Subsystem implements Differenti
     }
 
     public void tankDrive(double leftPercent, double rightPercent){
-        getLeftMotor().setPercentOutput(leftPercent);
-        getRightMotor().setPercentOutput(rightPercent);
+        getLeftMotor().setPercentOutput(leftPercent + (Math.signum(leftPercent) * kStatic));
+        getRightMotor().setPercentOutput(rightPercent + (Math.signum(rightPercent) * kStatic));
     }
 
     public void arcadeDrive(double linearPercent, double rotationPercent){
