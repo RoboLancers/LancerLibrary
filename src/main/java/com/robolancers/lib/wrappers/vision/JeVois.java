@@ -25,7 +25,7 @@ public class JeVois {
     private static final String PACKET_START_CHAR = "{";
     private static final String PACKET_END_CHAR = "}";
     private static final String PACKET_DILEM_CHAR = ",";
-    private static final int PACKET_NUM_EXPECTED_FIELDS = 3;
+    private static final int PACKET_NUM_EXPECTED_FIELDS = 2;
 
     // When streaming, use this set of configuration
     private static final int STREAM_WIDTH_PX = 320;
@@ -45,7 +45,6 @@ public class JeVois {
 
     // Most recently seen target information
     private boolean targetVisible;
-    private double targetDistance;
     private double targetAngle;
 
     /**
@@ -95,13 +94,6 @@ public class JeVois {
     /*
      * Main getters/setters
      */
-
-    /**
-     * Returns the distance the target is away from the camera
-     */
-    public double getTargetDistance() {
-        return targetDistance;
-    }
 
     /**
      * Returns the most recently seen target's angle relative to the camera in degrees
@@ -167,10 +159,7 @@ public class JeVois {
             System.out.println("Starting JeVois Cam Stream...");
 
             visionCam = CameraServer.getInstance().startAutomaticCapture();
-            visionCam.setVideoMode(PixelFormat.kYUYV, STREAM_WIDTH_PX, STREAM_HEIGHT_PX, STREAM_RATE_FPS);
-
-            //camServer = new MjpegServer("JeVoisServer" + CAMERA_NUMBER.getAndIncrement(), MJPG_STREAM_PORT.getAndIncrement());
-            //camServer.setSource(visionCam);
+            visionCam.setVideoMode(PixelFormat.kMJPEG, STREAM_WIDTH_PX, STREAM_HEIGHT_PX, STREAM_RATE_FPS);
 
             camStreamRunning = true;
             System.out.println("SUCCESS!!");
@@ -385,15 +374,14 @@ public class JeVois {
     public int parsePacket(String pkt){
         //Parsing constants. These must be aligned with JeVois code.
         final int TGT_VISIBLE_TOKEN_IDX = 0;
-        final int TGT_DISTANCE_TOKEN_IDX = 1;
-        final int TGT_ANGLE_TOKEN_IDX = 2;
+        final int TGT_ANGLE_TOKEN_IDX = 1;
 
         //Split string into many substrings, presuming those strings are separated by commas
         String[] tokens = pkt.split(",");
 
         //Check there were enough substrings found
         if(tokens.length < PACKET_NUM_EXPECTED_FIELDS){
-            DriverStation.reportError("Got malformed vision packet. Expected 8 tokens, but only found " + tokens.length + ". Packet Contents: " + pkt, false);
+            DriverStation.reportError("Got malformed vision packet. Expected 2 tokens, but only found " + tokens.length + ". Packet Contents: " + pkt, false);
             return -1;
         }
 
@@ -410,7 +398,6 @@ public class JeVois {
             }
 
             //Use Java built-in double to string conversion on most of the rest
-            targetDistance = Double.parseDouble(tokens[TGT_DISTANCE_TOKEN_IDX]);
             targetAngle = Double.parseDouble(tokens[TGT_ANGLE_TOKEN_IDX]);
         } catch (Exception e) {
             DriverStation.reportError("Unhandled exception while parsing Vision packet: " + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()), false);
