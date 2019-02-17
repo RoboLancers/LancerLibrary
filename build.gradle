@@ -1,12 +1,12 @@
 plugins {
     id 'java'
-    id "edu.wpi.first.GradleRIO" version "2019.2.1"
+    id "edu.wpi.first.GradleRIO" version "2019.3.2"
     id 'maven'
     id 'maven-publish'
 }
 
 group 'com.robolancers.lib'
-version '2019.2.15'
+version '2019.2.17'
 
 repositories {
     mavenCentral()
@@ -17,8 +17,8 @@ dependencies {
     compile wpi.deps.wpilib()
     compile wpi.deps.vendor.java()
 
-    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.3.11'
-    compile('com.github.5190GreenHopeRobotics:FalconLibrary:ca4549d458')
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.3.21'
+    compile('com.github.5190GreenHopeRobotics:FalconLibrary:88d44a33f5')
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
@@ -27,7 +27,7 @@ publishing {
         maven(MavenPublication) {
             groupId = "com.robolancers"
             artifactId = "LancerLibrary"
-            version = "2019.1.31"
+            version = "2019.2.17"
 
             from components.java
         }
