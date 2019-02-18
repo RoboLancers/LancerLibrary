@@ -1,12 +1,11 @@
 package com.robolancers.lib.wrappers.hid;
 
 import com.robolancers.lib.Utilities;
+import edu.wpi.first.wpilibj.buttons.POVButton;
 import edu.wpi.first.wpilibj.command.Command;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class FlightController extends BaseController{
-    private static final int NUMBER_OF_AXIS = Trigger.values().length;
-
     public enum Axis {
         X(0),
         Y(1, true),
@@ -51,6 +50,25 @@ public class FlightController extends BaseController{
         }
     }
 
+    public enum POV {
+        UP(0,0),
+        UP_RIGHT(1,45),
+        RIGHT(2,90),
+        DOWN_RIGHT(3,135),
+        DOWN(4,180),
+        DOWN_LEFT(5,225),
+        LEFT(6,270),
+        UP_LEFT(7,315);
+
+        int index;
+        int angle;
+
+        POV(int index, int angle){
+            this.index = index;
+            this.angle = angle;
+        }
+    }
+
     public enum Trigger {
         X_FORWARD(Axis.X.port),
         X_BACKWARD(Axis.X.port, true),
@@ -84,10 +102,16 @@ public class FlightController extends BaseController{
     public FlightController(int port, double deadzone) {
         super(port);
 
-        triggerButtons = new TriggerButton[NUMBER_OF_AXIS];
+        triggerButtons = new TriggerButton[Trigger.values().length];
 
         for(int i = 0; i < triggerButtons.length; i++){
             triggerButtons[i] = new TriggerButton(joystick, i, Trigger.values()[i].negative);
+        }
+
+        povButtons = new POVButton[POV.values().length];
+
+        for(int i = 0; i < povButtons.length; i++){
+            povButtons[i] = new POVButton(joystick, POV.values()[i].angle);
         }
 
         this.deadzone = deadzone;
@@ -105,6 +129,10 @@ public class FlightController extends BaseController{
         return triggerButtons[trigger.port].get();
     }
 
+    public boolean getState(POV pov){
+        return joystick.getPOV() == pov.angle;
+    }
+
     public FlightController whileHeld(Trigger trigger, Command command){
         triggerButtons[trigger.port].whileActive(command);
         return this;
@@ -112,6 +140,11 @@ public class FlightController extends BaseController{
 
     public FlightController whileHeld(Button button, Command command){
         buttons[button.port].whileHeld(command);
+        return this;
+    }
+
+    public FlightController whileHeld(POV pov, Command command){
+        povButtons[pov.index].whileHeld(command);
         return this;
     }
 
@@ -125,6 +158,11 @@ public class FlightController extends BaseController{
         return this;
     }
 
+    public FlightController whenPressed(POV pov, Command command){
+        povButtons[pov.index].whenPressed(command);
+        return this;
+    }
+
     public FlightController whenReleased(Trigger trigger, Command command){
         triggerButtons[trigger.port].whenInactive(command);
         return this;
@@ -132,6 +170,11 @@ public class FlightController extends BaseController{
 
     public FlightController whenReleased(Button button, Command command){
         buttons[button.port].whenReleased(command);
+        return this;
+    }
+
+    public FlightController whenReleased(POV pov, Command command){
+        povButtons[pov.index].whenReleased(command);
         return this;
     }
 
@@ -145,6 +188,11 @@ public class FlightController extends BaseController{
         return this;
     }
 
+    public FlightController toggleWhenPressed(POV pov, Command command){
+        povButtons[pov.index].toggleWhenPressed(command);
+        return this;
+    }
+
     public FlightController cancelWhenPressed(Trigger trigger, Command command){
         triggerButtons[trigger.port].cancelWhenActive(command);
         return this;
@@ -152,6 +200,11 @@ public class FlightController extends BaseController{
 
     public FlightController cancelWhenPressed(Button button, Command command){
         buttons[button.port].cancelWhenPressed(command);
+        return this;
+    }
+
+    public FlightController cancelWhenPressed(POV pov, Command command){
+        povButtons[pov.index].cancelWhenPressed(command);
         return this;
     }
 }

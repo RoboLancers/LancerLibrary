@@ -3,20 +3,21 @@ package com.robolancers.lib.wrappers.hid;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.buttons.POVButton;
 
 abstract class BaseController {
-    private static final int NUMBER_OF_BUTTONS = 13;
     double deadzone = 0;
 
     Joystick joystick;
     Button[] buttons;
     TriggerButton[] triggerButtons;
+    POVButton[] povButtons;
 
     BaseController(int port) {
         joystick = new Joystick(port);
-        buttons = new JoystickButton[NUMBER_OF_BUTTONS];
+        buttons = new JoystickButton[joystick.getButtonCount()];
 
-        for (int i = 0; i < buttons.length; i++) {
+        for (int i = 0; i < joystick.getButtonCount(); i++) {
             buttons[i] = new JoystickButton(joystick, i);
         }
     }

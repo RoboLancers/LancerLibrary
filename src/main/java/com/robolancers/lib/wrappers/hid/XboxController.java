@@ -1,6 +1,7 @@
 package com.robolancers.lib.wrappers.hid;
 
 import com.robolancers.lib.Utilities;
+import edu.wpi.first.wpilibj.buttons.POVButton;
 import edu.wpi.first.wpilibj.command.Command;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -47,6 +48,21 @@ public class XboxController extends BaseController {
         }
     }
 
+    public enum POV {
+        UP(0,0),
+        RIGHT(1,90),
+        DOWN(2,180),
+        LEFT(3,270);
+
+        int index;
+        int angle;
+
+        POV(int index, int angle){
+            this.index = index;
+            this.angle = angle;
+        }
+    }
+
     public enum Trigger {
         LEFT_X(Axis.LEFT_X.port),
         LEFT_Y(Axis.LEFT_Y.port),
@@ -81,6 +97,12 @@ public class XboxController extends BaseController {
             triggerButtons[i] = new TriggerButton(joystick, i, Trigger.values()[i].negative);
         }
 
+        povButtons = new POVButton[POV.values().length];
+
+        for(int i = 0; i < povButtons.length; i++){
+            povButtons[i] = new POVButton(joystick, POV.values()[i].angle);
+        }
+
         this.deadzone = deadzone;
     }
 
@@ -88,8 +110,16 @@ public class XboxController extends BaseController {
         return Utilities.applyDeadband(axis.inverted * joystick.getRawAxis(axis.port), deadzone);
     }
 
-    public boolean getButtonState(Button button){
+    public boolean getState(Button button){
         return joystick.getRawButton(button.port);
+    }
+
+    public boolean getState(Trigger trigger){
+        return triggerButtons[trigger.port].get();
+    }
+
+    public boolean getState(POV pov){
+        return joystick.getPOV() == pov.angle;
     }
 
     public XboxController whileHeld(Trigger trigger, Command command){
@@ -99,6 +129,11 @@ public class XboxController extends BaseController {
 
     public XboxController whileHeld(Button button, Command command){
         buttons[button.port].whileHeld(command);
+        return this;
+    }
+
+    public XboxController whileHeld(POV pov, Command command){
+        povButtons[pov.index].whileHeld(command);
         return this;
     }
 
@@ -112,6 +147,11 @@ public class XboxController extends BaseController {
         return this;
     }
 
+    public XboxController whenPressed(POV pov, Command command){
+        povButtons[pov.index].whenPressed(command);
+        return this;
+    }
+
     public XboxController whenReleased(Trigger trigger, Command command){
         triggerButtons[trigger.port].whenInactive(command);
         return this;
@@ -119,6 +159,11 @@ public class XboxController extends BaseController {
 
     public XboxController whenReleased(Button button, Command command){
         buttons[button.port].whenReleased(command);
+        return this;
+    }
+
+    public XboxController whenReleased(POV pov, Command command){
+        povButtons[pov.index].whenReleased(command);
         return this;
     }
 
@@ -132,6 +177,11 @@ public class XboxController extends BaseController {
         return this;
     }
 
+    public XboxController toggleWhenPressed(POV pov, Command command){
+        povButtons[pov.index].toggleWhenPressed(command);
+        return this;
+    }
+
     public XboxController cancelWhenPressed(Trigger trigger, Command command){
         triggerButtons[trigger.port].cancelWhenActive(command);
         return this;
@@ -139,6 +189,11 @@ public class XboxController extends BaseController {
 
     public XboxController cancelWhenPressed(Button button, Command command){
         buttons[button.port].cancelWhenPressed(command);
+        return this;
+    }
+
+    public XboxController cancelWhenPressed(POV pov, Command command){
+        povButtons[pov.index].cancelWhenPressed(command);
         return this;
     }
 }
