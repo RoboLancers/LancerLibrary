@@ -6,7 +6,7 @@ import org.ghrobotics.lib.utils.DeltaTime;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class LancerPID {
     private double kP, kI, kD,  kF = 0;
-    private double iOutput = 0;
+    private double errorSum = 0;
 
     private double target = 0;
     private double error;
@@ -41,6 +41,7 @@ public class LancerPID {
         double deltaTime = deltaTimeController.updateTime(TimeUnitsKt.getMillisecond(System.currentTimeMillis())).getSecond();
 
         error = target - actual;
+        errorSum += error * deltaTime;
 
         if(firstRun) {
             lastActual = actual;
@@ -49,10 +50,10 @@ public class LancerPID {
 
         double fOutput = kF * target;
         double pOutput = kP * error;
-        iOutput += error * deltaTime;
+        double iOutput = kI * errorSum;
         double dOutput = kD * ((actual - lastActual) / deltaTime);
 
-        double output = fOutput + pOutput + iOutput + dOutput;
+        double output = fOutput + pOutput + errorSum + dOutput;
 
         lastActual = actual;
 
@@ -64,7 +65,7 @@ public class LancerPID {
     }
 
     public void reset() {
-        iOutput = 0;
+        errorSum = 0;
         lastActual = 0;
         deltaTimeController.reset();
         firstRun = true;
