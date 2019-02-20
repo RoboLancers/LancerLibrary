@@ -1,16 +1,20 @@
 package com.robolancers.lib.auto;
 
-@SuppressWarnings({"unused", "UnusedAssignment"})
-public class LancerPID {
-    private double kP = 0, kI = 0, kD = 0,  kF = 0;
-    private double output = 0, kPoutput = 0, kIoutput = 0, kDoutput = 0, kFoutput = 0;
+import org.ghrobotics.lib.mathematics.units.TimeUnitsKt;
+import org.ghrobotics.lib.utils.DeltaTime;
 
-    private double time = 0.02;
+@SuppressWarnings({"unused", "WeakerAccess"})
+public class LancerPID {
+    private double kP, kI, kD,  kF = 0;
+    private double iOutput = 0;
+
     private double target = 0;
     private double error;
 
     private boolean firstRun;
     private double lastActual = 0;
+
+    private DeltaTime deltaTimeController;
 
     public LancerPID(double p, double i, double d) {
         kP = p;
@@ -18,18 +22,24 @@ public class LancerPID {
         kD = d;
 
         firstRun = true;
+
+        deltaTimeController = new DeltaTime(TimeUnitsKt.getMillisecond(System.currentTimeMillis()));
     }
 
     public LancerPID(double p, double i, double d, double f) {
         this(p, i, d);
+
         kF = f;
     }
 
-    public double setTarget(double target) {
-        return this.target = target;
+    public void setTarget(double target) {
+        this.target = target;
+        deltaTimeController.reset();
     }
 
     public double getOutput(double actual) {
+        double deltaTime = deltaTimeController.updateTime(TimeUnitsKt.getMillisecond(System.currentTimeMillis())).getSecond();
+
         error = target - actual;
 
         if(firstRun) {
@@ -37,14 +47,15 @@ public class LancerPID {
             firstRun = false;
         }
 
-        kFoutput = kF * target;
-        kPoutput = kP * error;
-        kIoutput += error * time;
-        kDoutput = kD * ((actual - lastActual)/ time);
+        double fOutput = kF * target;
+        double pOutput = kP * error;
+        iOutput += error * deltaTime;
+        double dOutput = kD * ((actual - lastActual) / deltaTime);
 
-        output = kFoutput + kPoutput + kIoutput + kDoutput;
+        double output = fOutput + pOutput + iOutput + dOutput;
 
         lastActual = actual;
+
         return output;
     }
 
@@ -53,8 +64,9 @@ public class LancerPID {
     }
 
     public void reset() {
-        kIoutput = 0;
+        iOutput = 0;
         lastActual = 0;
+        deltaTimeController.reset();
         firstRun = true;
     }
 }
