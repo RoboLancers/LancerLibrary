@@ -17,7 +17,7 @@ public abstract class TankDriveSubsystem extends Subsystem implements Differenti
     private static double kQuickStopAlpha = DifferentialDrive.kDefaultQuickStopAlpha;
     private double quickStopAccumulator = 0;
 
-    private double kStatic = 0.1;
+    private double kStatic = 0.0;
 
     public void setkStatic(double kStatic){
         this.kStatic = kStatic;
