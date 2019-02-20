@@ -4,20 +4,17 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
-@SuppressWarnings("unused")
-public class ChangeDoubleSolenoidState extends InstantCommand {
+public class ToggleDoubleSolenoid extends InstantCommand {
     private DoubleSolenoid doubleSolenoid;
-    private DoubleSolenoid.Value value;
 
-    public ChangeDoubleSolenoidState(Subsystem subsystem, DoubleSolenoid doubleSolenoid, DoubleSolenoid.Value value){
+    public ToggleDoubleSolenoid(Subsystem subsystem, DoubleSolenoid doubleSolenoid){
         requires(subsystem);
 
         this.doubleSolenoid = doubleSolenoid;
-        this.value = value;
     }
 
     @Override
     protected void initialize(){
-        doubleSolenoid.set(value);
+        doubleSolenoid.set(doubleSolenoid.get() == DoubleSolenoid.Value.kForward ? DoubleSolenoid.Value.kReverse : DoubleSolenoid.Value.kForward);
     }
 }
