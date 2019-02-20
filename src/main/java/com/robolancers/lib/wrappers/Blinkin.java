@@ -19,8 +19,6 @@ public class Blinkin {
     }
 
     public enum PatternType {
-        // TODO Finish putting all possible values here
-        //Fixed Palette Pattern
         RAINBOW_RAINBOW_PALETTE(-0.99),
         RAINBOW_PARTY_PALETTE(-0.97),
         RAINBOW_OCEAN_PALETTE(-0.95),
