@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
+@SuppressWarnings("unused")
 public class SetSolenoid extends InstantCommand {
     private Solenoid solenoid;
     private boolean value;
