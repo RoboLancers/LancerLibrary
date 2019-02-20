@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 @SuppressWarnings("unused")
 public class LinkedLimitSwitches {
     private DigitalInput[] limitSwitches;
+    private boolean invert;
 
     public LinkedLimitSwitches(int... ports){
         limitSwitches = new DigitalInput[ports.length];
@@ -16,8 +17,12 @@ public class LinkedLimitSwitches {
         }
     }
 
+    public void invert(boolean invert){
+        this.invert = invert;
+    }
+
     public boolean get(){
-        return Stream.of(limitSwitches).anyMatch(DigitalInput::get);
+        return Stream.of(limitSwitches).anyMatch(digitalInput -> invert != digitalInput.get());
     }
 
     public boolean get(int index) {
