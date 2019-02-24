@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements FalconMotor<T> {
-    private CANPIDController canpidController;
+    private CANPIDController canPIDController;
     private CANEncoder canEncoder;
 
     //Native unit model should have gear ratio as sensorUnitPerRevolution and Length as wheel radius
@@ -23,14 +23,16 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
     public LancerSparkMax(int deviceID, MotorType type, NativeUnitModel<T> nativeUnitModel) {
         super(deviceID, type);
 
-        canpidController = new CANPIDController(this);
+        restoreFactoryDefaults();
+
+        canPIDController = new CANPIDController(this);
         canEncoder = new CANEncoder(this);
 
         this.nativeUnitModel = nativeUnitModel;
     }
 
-    public CANPIDController getCanpidController(){
-        return canpidController;
+    public CANPIDController getCanPIDController(){
+        return canPIDController;
     }
 
     public CANEncoder getCanEncoder(){
@@ -39,7 +41,7 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
 
     @Override
     public double getPercentOutput() {
-        return getAppliedOutput() / getBusVoltage();
+        return get();
     }
 
     @Override
@@ -63,7 +65,7 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
 
     @Override
     public void setVelocity(@NotNull Velocity<T> velocity) {
-        canpidController.setReference(
+        canPIDController.setReference(
                 nativeUnitModel.toNativeUnitVelocity(velocity).getValue() * 60,
                 ControlType.kVelocity
         );
@@ -71,7 +73,7 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
 
     @Override
     public void setVelocityAndArbitraryFeedForward(@NotNull Velocity<T> velocity, double arbitraryFeedForward) {
-        canpidController.setReference(
+        canPIDController.setReference(
                 nativeUnitModel.toNativeUnitVelocity(velocity).getValue() * 60,
                 ControlType.kVelocity,
                 0,
@@ -83,9 +85,9 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
         return nativeUnitModel.fromNativeUnitPosition(NativeUnitKt.getNativeUnits(canEncoder.getPosition()));
     }
 
-    public static void checkCANError(CANError canError, String methodName){
+    public static void checkCANError(LancerSparkMax lancerSparkMax, CANError canError, String methodName){
         if(canError != CANError.kOK){
-            DriverStation.reportError("(SparkMax) " + canError.name() + " in " + methodName, false);
+            DriverStation.reportError("(SparkMax " + lancerSparkMax.getDeviceId()  + ") " + canError.name() + " in " + methodName, false);
         }
     }
 
@@ -94,19 +96,19 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
 
         switch (type){
             case FF:
-                canError = canpidController.setFF(gain);
+                canError = canPIDController.setFF(gain);
                 break;
             case P:
-                canError = canpidController.setP(gain);
+                canError = canPIDController.setP(gain);
                 break;
             case I:
-                canError = canpidController.setI(gain);
+                canError = canPIDController.setI(gain);
                 break;
             case D:
-                canError = canpidController.setD(gain);
+                canError = canPIDController.setD(gain);
                 break;
         }
 
-        checkCANError(canError, "setGain");
+        checkCANError(this, canError, "setGain");
     }
 }
