@@ -45,6 +45,7 @@ public class JeVois {
 
     // Most recently seen target information
     private boolean targetVisible;
+    private double targetDistance;
     private double targetAngle;
 
     /**
@@ -94,6 +95,13 @@ public class JeVois {
     /*
      * Main getters/setters
      */
+
+    /**
+     * Returns the most recently seen target's distance in inches
+     */
+    public double getTargetDistance(){
+        return targetDistance;
+    }
 
     /**
      * Returns the most recently seen target's angle relative to the camera in degrees
@@ -374,7 +382,8 @@ public class JeVois {
     public int parsePacket(String pkt){
         //Parsing constants. These must be aligned with JeVois code.
         final int TGT_VISIBLE_TOKEN_IDX = 0;
-        final int TGT_ANGLE_TOKEN_IDX = 1;
+        final int TGT_DISTANCE_TOKEN_IDX = 2;
+        final int TGT_ANGLE_TOKEN_IDX = 3;
 
         //Split string into many substrings, presuming those strings are separated by commas
         String[] tokens = pkt.split(",");
@@ -387,17 +396,9 @@ public class JeVois {
 
         //Convert each string into the proper internal value
         try {
-            //Boolean values should only have T or F characters
-            if(tokens[TGT_VISIBLE_TOKEN_IDX].equals("F")){
-                targetVisible = false;
-            } else if (tokens[TGT_VISIBLE_TOKEN_IDX].equals("T")) {
-                targetVisible = true;
-            } else {
-                DriverStation.reportError("Got malformed vision packet. Expected only T or F in " + TGT_VISIBLE_TOKEN_IDX + ", but got " + tokens[TGT_VISIBLE_TOKEN_IDX], false);
-                return -1;
-            }
-
             //Use Java built-in double to string conversion on most of the rest
+            targetVisible = Double.parseDouble(tokens[TGT_VISIBLE_TOKEN_IDX]) == 1;
+            targetDistance = Double.parseDouble(tokens[TGT_DISTANCE_TOKEN_IDX]);
             targetAngle = Double.parseDouble(tokens[TGT_ANGLE_TOKEN_IDX]);
         } catch (Exception e) {
             DriverStation.reportError("Unhandled exception while parsing Vision packet: " + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()), false);
