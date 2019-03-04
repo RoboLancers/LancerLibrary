@@ -52,7 +52,7 @@ public class LancerSparkMax<T extends SIUnit<T>> extends CANSparkMax implements 
     @NotNull
     @Override
     public Volt getVoltageOutput() {
-        return VoltKt.getVolt(getAppliedOutput());
+        return VoltKt.getVolt(getAppliedOutput() * getBusVoltage());
     }
 
     @NotNull
