@@ -1,12 +1,12 @@
 package com.robolancers.lib.wrappers.hid;
 
 import com.robolancers.lib.Utilities;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.buttons.POVButton;
 import edu.wpi.first.wpilibj.command.Command;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class XboxController extends BaseController {
-    private static final int NUMBER_OF_AXIS = Axis.values().length;
 
     public enum Axis {
         LEFT_X(0),
@@ -91,7 +91,13 @@ public class XboxController extends BaseController {
     public XboxController(int port, double deadzone) {
         super(port);
 
-        triggerButtons = new TriggerButton[NUMBER_OF_AXIS];
+        buttons = new JoystickButton[Button.values().length];
+
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i] = new JoystickButton(joystick, i);
+        }
+
+        triggerButtons = new TriggerButton[Axis.values().length];
 
         for(int i = 0; i < triggerButtons.length; i++){
             triggerButtons[i] = new TriggerButton(joystick, i, Trigger.values()[i].negative);

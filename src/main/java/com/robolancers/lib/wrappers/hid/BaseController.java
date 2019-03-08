@@ -16,10 +16,5 @@ abstract class BaseController {
 
     BaseController(int port) {
         joystick = new Joystick(port);
-        buttons = new JoystickButton[joystick.getButtonCount()];
-
-        for (int i = 0; i < joystick.getButtonCount(); i++) {
-            buttons[i] = new JoystickButton(joystick, i);
-        }
     }
 }

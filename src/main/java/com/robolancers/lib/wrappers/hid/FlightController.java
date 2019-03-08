@@ -1,6 +1,7 @@
 package com.robolancers.lib.wrappers.hid;
 
 import com.robolancers.lib.Utilities;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.buttons.POVButton;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -101,6 +102,12 @@ public class FlightController extends BaseController{
 
     public FlightController(int port, double deadzone) {
         super(port);
+
+        buttons = new JoystickButton[Button.values().length];
+
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i] = new JoystickButton(joystick, i);
+        }
 
         triggerButtons = new TriggerButton[Trigger.values().length];
 
