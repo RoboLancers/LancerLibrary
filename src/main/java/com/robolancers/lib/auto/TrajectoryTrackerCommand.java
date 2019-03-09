@@ -1,8 +1,13 @@
 package com.robolancers.lib.auto;
 
 import com.robolancers.lib.subsystems.drivetrain.TankDriveSubsystem;
+import com.team254.lib.physics.DifferentialDrive;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import org.ghrobotics.lib.debug.LiveDashboard;
 import org.ghrobotics.lib.localization.Localization;
 import org.ghrobotics.lib.mathematics.twodim.control.TrajectoryTracker;
@@ -11,8 +16,12 @@ import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2dWithCurvature;
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedEntry;
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TimedTrajectory;
 import org.ghrobotics.lib.mathematics.twodim.trajectory.types.TrajectorySamplePoint;
+import org.ghrobotics.lib.mathematics.units.LengthKt;
 import org.ghrobotics.lib.mathematics.units.TimeUnitsKt;
+import org.ghrobotics.lib.mathematics.units.derivedunits.VelocityKt;
 import org.ghrobotics.lib.subsystems.drive.TrajectoryTrackerDriveBase;
+import org.ghrobotics.lib.subsystems.drive.TrajectoryTrackerOutput;
+
 import java.util.function.Supplier;
 
 @SuppressWarnings({"unused"})
@@ -20,8 +29,14 @@ public class TrajectoryTrackerCommand extends Command {
     private TrajectoryTracker trajectoryTracker;
     private Supplier<TimedTrajectory<Pose2dWithCurvature>> trajectorySource;
     private TrajectoryTrackerDriveBase driveBase;
+    private TankDriveSubsystem tankDriveSubsystem;
     private Localization localization;
     private boolean reset;
+
+    private ShuffleboardTab trajectoryTrackerTab;
+
+    private NetworkTableEntry pathLeftVelocityEntry, pathRightVelocityEntry;
+    private NetworkTableEntry robotLeftVelocityEntry, robotRightVelocityEntry;
 
     public TrajectoryTrackerCommand(TankDriveSubsystem tankDriveSubsystem, TrajectoryTrackerDriveBase driveBase, Supplier<TimedTrajectory<Pose2dWithCurvature>> trajectorySource){
         this(tankDriveSubsystem, driveBase, trajectorySource, false);
@@ -33,8 +48,17 @@ public class TrajectoryTrackerCommand extends Command {
         this.trajectoryTracker = driveBase.getTrajectoryTracker();
         this.trajectorySource = trajectorySource;
         this.driveBase = driveBase;
+        this.tankDriveSubsystem = tankDriveSubsystem;
         this.localization = tankDriveSubsystem.getLocalization();
         this.reset = reset;
+
+        trajectoryTrackerTab = Shuffleboard.getTab("Trajectory Tracker");
+
+        pathLeftVelocityEntry = trajectoryTrackerTab.add("Path Left Velocity", 0.0).withWidget(BuiltInWidgets.kGraph).getEntry();
+        pathRightVelocityEntry = trajectoryTrackerTab.add("Path Right Velocity", 0.0).withWidget(BuiltInWidgets.kGraph).getEntry();
+
+        robotLeftVelocityEntry = trajectoryTrackerTab.add("Robot Left Velocity", 0.0).withWidget(BuiltInWidgets.kGraph).getEntry();
+        robotRightVelocityEntry = trajectoryTrackerTab.add("Robot Right Velocity", 0.0).withWidget(BuiltInWidgets.kGraph).getEntry();
     }
 
     @Override
@@ -50,7 +74,12 @@ public class TrajectoryTrackerCommand extends Command {
 
     @Override
     protected void execute(){
-        driveBase.setOutput(trajectoryTracker.nextState(driveBase.getRobotPosition(), TimeUnitsKt.getMillisecond(System.currentTimeMillis())));
+        TrajectoryTrackerOutput nextState = trajectoryTracker.nextState(driveBase.getRobotPosition(), TimeUnitsKt.getMillisecond(System.currentTimeMillis()));
+        DifferentialDrive.DriveDynamics driveDynamics = tankDriveSubsystem.getDifferentialDrive().solveInverseDynamics(nextState.getDifferentialDriveVelocity(), nextState.getDifferentialDriveAcceleration());
+        double leftVelocity = VelocityKt.getFeetPerSecond(VelocityKt.getVelocity(LengthKt.getMeter(driveDynamics.getWheelVelocity().getLeft())));
+        double rightVelocity = VelocityKt.getFeetPerSecond(VelocityKt.getVelocity(LengthKt.getMeter(driveDynamics.getWheelVelocity().getRight())));
+
+        driveBase.setOutput(nextState);
 
         TrajectorySamplePoint<TimedEntry<Pose2dWithCurvature>> referencePoint = trajectoryTracker.getReferencePoint();
         if(referencePoint != null){
@@ -59,6 +88,12 @@ public class TrajectoryTrackerCommand extends Command {
             LiveDashboard.INSTANCE.setPathX(referencePose.getTranslation().getX().getFeet());
             LiveDashboard.INSTANCE.setPathY(referencePose.getTranslation().getY().getFeet());
             LiveDashboard.INSTANCE.setPathHeading(referencePose.getRotation().getRadian());
+
+            pathLeftVelocityEntry.setDouble(leftVelocity);
+            pathRightVelocityEntry.setDouble(rightVelocity);
+
+            robotLeftVelocityEntry.setDouble(VelocityKt.getFeetPerSecond(tankDriveSubsystem.getLeftMotor().getVelocity()));
+            robotRightVelocityEntry.setDouble(VelocityKt.getFeetPerSecond(tankDriveSubsystem.getRightMotor().getVelocity()));
         }
     }
 
