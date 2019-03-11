@@ -64,8 +64,8 @@ public class TrajectoryTrackerCommand extends Command {
     protected void execute(){
         TrajectoryTrackerOutput nextState = trajectoryTracker.nextState(driveBase.getRobotPosition(), TimeUnitsKt.getMillisecond(System.currentTimeMillis()));
         DifferentialDrive.DriveDynamics driveDynamics = tankDriveSubsystem.getDifferentialDrive().solveInverseDynamics(nextState.getDifferentialDriveVelocity(), nextState.getDifferentialDriveAcceleration());
-        double leftVelocity = VelocityKt.getFeetPerSecond(VelocityKt.getVelocity(LengthKt.getMeter(driveDynamics.getWheelVelocity().getLeft())));
-        double rightVelocity = VelocityKt.getFeetPerSecond(VelocityKt.getVelocity(LengthKt.getMeter(driveDynamics.getWheelVelocity().getRight())));
+        double leftVelocity = VelocityKt.getFeetPerSecond(VelocityKt.getVelocity(LengthKt.getMeter(driveDynamics.getWheelVelocity().getLeft() * tankDriveSubsystem.getDifferentialDrive().getWheelRadius())));
+        double rightVelocity = VelocityKt.getFeetPerSecond(VelocityKt.getVelocity(LengthKt.getMeter(driveDynamics.getWheelVelocity().getRight() * tankDriveSubsystem.getDifferentialDrive().getWheelRadius())));
 
         driveBase.setOutput(nextState);
 
