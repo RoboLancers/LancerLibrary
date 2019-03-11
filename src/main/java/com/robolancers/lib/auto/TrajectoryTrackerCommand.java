@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.ghrobotics.lib.debug.LiveDashboard;
 import org.ghrobotics.lib.localization.Localization;
 import org.ghrobotics.lib.mathematics.twodim.control.TrajectoryTracker;
@@ -33,11 +34,6 @@ public class TrajectoryTrackerCommand extends Command {
     private Localization localization;
     private boolean reset;
 
-    private ShuffleboardTab trajectoryTrackerTab;
-
-    private NetworkTableEntry pathLeftVelocityEntry, pathRightVelocityEntry;
-    private NetworkTableEntry robotLeftVelocityEntry, robotRightVelocityEntry;
-
     public TrajectoryTrackerCommand(TankDriveSubsystem tankDriveSubsystem, TrajectoryTrackerDriveBase driveBase, Supplier<TimedTrajectory<Pose2dWithCurvature>> trajectorySource){
         this(tankDriveSubsystem, driveBase, trajectorySource, false);
     }
@@ -51,14 +47,6 @@ public class TrajectoryTrackerCommand extends Command {
         this.tankDriveSubsystem = tankDriveSubsystem;
         this.localization = tankDriveSubsystem.getLocalization();
         this.reset = reset;
-
-        trajectoryTrackerTab = Shuffleboard.getTab("Trajectory Tracker");
-
-        pathLeftVelocityEntry = trajectoryTrackerTab.add("Path Left Velocity", 0.0).withWidget(BuiltInWidgets.kGraph).getEntry();
-        pathRightVelocityEntry = trajectoryTrackerTab.add("Path Right Velocity", 0.0).withWidget(BuiltInWidgets.kGraph).getEntry();
-
-        robotLeftVelocityEntry = trajectoryTrackerTab.add("Robot Left Velocity", 0.0).withWidget(BuiltInWidgets.kGraph).getEntry();
-        robotRightVelocityEntry = trajectoryTrackerTab.add("Robot Right Velocity", 0.0).withWidget(BuiltInWidgets.kGraph).getEntry();
     }
 
     @Override
@@ -89,11 +77,8 @@ public class TrajectoryTrackerCommand extends Command {
             LiveDashboard.INSTANCE.setPathY(referencePose.getTranslation().getY().getFeet());
             LiveDashboard.INSTANCE.setPathHeading(referencePose.getRotation().getRadian());
 
-            pathLeftVelocityEntry.setDouble(leftVelocity);
-            pathRightVelocityEntry.setDouble(rightVelocity);
-
-            robotLeftVelocityEntry.setDouble(VelocityKt.getFeetPerSecond(tankDriveSubsystem.getLeftMotor().getVelocity()));
-            robotRightVelocityEntry.setDouble(VelocityKt.getFeetPerSecond(tankDriveSubsystem.getRightMotor().getVelocity()));
+            SmartDashboard.putNumber("Left Path Velocity", leftVelocity);
+            SmartDashboard.putNumber("Right Path Velocity", rightVelocity);
         }
     }
 
