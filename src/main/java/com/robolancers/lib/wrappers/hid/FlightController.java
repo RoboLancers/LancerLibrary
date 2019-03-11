@@ -103,7 +103,7 @@ public class FlightController extends BaseController{
     public FlightController(int port, double deadzone) {
         super(port);
 
-        buttons = new JoystickButton[Button.values().length];
+        buttons = new JoystickButton[Button.values().length + 1];
 
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new JoystickButton(joystick, i);
