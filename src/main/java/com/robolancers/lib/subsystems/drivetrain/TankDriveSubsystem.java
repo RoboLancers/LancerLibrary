@@ -104,11 +104,11 @@ public abstract class TankDriveSubsystem extends Subsystem implements Differenti
         tankDrive(leftMotorOutput, rightMotorOutput);
     }
 
-    public TrajectoryTrackerCommand followTrajectory(TimedTrajectory<Pose2dWithCurvature> trajectory){
+    /*public TrajectoryTrackerCommand followTrajectory(TimedTrajectory<Pose2dWithCurvature> trajectory){
         return followTrajectory(trajectory, false);
     }
 
     public TrajectoryTrackerCommand followTrajectory(TimedTrajectory<Pose2dWithCurvature> trajectory, boolean reset){
         return new TrajectoryTrackerCommand(this, this, () -> trajectory, reset);
-    }
+    }*/
 }
