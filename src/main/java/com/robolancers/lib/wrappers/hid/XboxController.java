@@ -1,6 +1,7 @@
 package com.robolancers.lib.wrappers.hid;
 
 import com.robolancers.lib.Utilities;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.buttons.POVButton;
 import edu.wpi.first.wpilibj.command.Command;
@@ -201,5 +202,10 @@ public class XboxController extends BaseController {
     public XboxController cancelWhenPressed(POV pov, Command command){
         povButtons[pov.index].cancelWhenPressed(command);
         return this;
+    }
+
+    public void setRumble(boolean rumble){
+        joystick.setRumble(GenericHID.RumbleType.kLeftRumble, rumble ? 1 : 0);
+        joystick.setRumble(GenericHID.RumbleType.kRightRumble, rumble ? 1 : 0);
     }
 }
